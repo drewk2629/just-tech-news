@@ -1,5 +1,6 @@
 const { Model, DataTypes } = require('sequelize');
 const sequelize = require('../config/connection');
+const bcrypt = require('bcrypt');
 
 // create User model
 class User extends Model {}
@@ -44,8 +45,25 @@ User.init(
             }
         }
     },
-        // table column definitions
     {
+        hooks: {
+            // set up beforeCreate lifecycle "hook" funcionality
+            // hash password
+            async beforeCreate(newUserData) {
+                newUserData.password = await bcrypt.hash(newUserData.password, 10);
+                    return newUserData;
+                },
+            // set up beforeUpdate lifecycle ***
+            async beforeUpdate(updatedUserData) {
+                updatedUserData.password = await bcrypt.hash(updatedUserData.password, 10);
+                return updatedUserData;
+            }
+            
+        },  
+            
+    
+        // table column definitions
+    
         // table config options
 
         // pass sequelize connection
@@ -62,7 +80,9 @@ User.init(
 
         // make model name stay lowercase in db
         modelName: 'user'
-    }
+            
+    },
+
 );
 
 module.exports = User;
