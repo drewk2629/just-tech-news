@@ -3,7 +3,12 @@ const sequelize = require('../config/connection');
 const bcrypt = require('bcrypt');
 
 // create User model
-class User extends Model {}
+class User extends Model {
+    // set up method to run on instance data (per user) to check the password
+    checkPassword(loginPW) {
+        return bcrypt.compareSync(loginPW, this.password);
+    }
+}
 
 // define table, columns, config
 User.init(
@@ -58,7 +63,6 @@ User.init(
                 updatedUserData.password = await bcrypt.hash(updatedUserData.password, 10);
                 return updatedUserData;
             }
-            
         },  
             
     
@@ -79,10 +83,8 @@ User.init(
         underscored: true,
 
         // make model name stay lowercase in db
-        modelName: 'user'
-            
+        modelName: 'user'     
     },
-
 );
 
 module.exports = User;
